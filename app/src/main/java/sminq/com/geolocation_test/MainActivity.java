@@ -216,21 +216,8 @@ public class MainActivity extends AppCompatActivity implements OnCompleteListene
                                                                                     GEOFENCE_TRANSITION_ENTER notification when the geofence is added and if the device
                                                                                     is already inside that geofence.**/
 
-
-            Calendar geoFenceExpiryCalendar = Calendar.getInstance();
-            geoFenceExpiryCalendar.add(Calendar.HOUR, 24);//We will add 24 Hrs, in the Calendar, i,e, GeFencing will expire after 2 Hrs from current Time.
-
-            Geofence geoFence = new Geofence.Builder().setRequestId(GEO_FENCE_KEY)
-                                    .setCircularRegion(latitude, longitude, radius)
-                                    .setExpirationDuration(geoFenceExpiryCalendar.getTimeInMillis())
-                                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-                                    .build();
-
-
-            // Add the geofences to be monitored by geofencing service.
-            ArrayList<Geofence> geofencesAl = new ArrayList<>();
-            geofencesAl.add(geoFence);
-            builder.addGeofences(geofencesAl);
+            ArrayList<Geofence> getgeoFencesAl = GeofenceBuilder.getGeoFences();
+            builder.addGeofences(getgeoFencesAl);
             geoFencingRequst = builder.build();
 
 
