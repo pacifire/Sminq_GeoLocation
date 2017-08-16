@@ -45,8 +45,7 @@ public class GeofenceTransitionIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        Log.d(TAG, "onHandleIntent: ");
-        
+
         GeofencingEvent geoFencingEvent = GeofencingEvent.fromIntent(intent);//Extractig the GeoFencingEvent from the Intent....
 
         if(geoFencingEvent.hasError()){
@@ -67,7 +66,6 @@ public class GeofenceTransitionIntentService extends IntentService {
             case Geofence.GEOFENCE_TRANSITION_EXIT:
                 // Get the geofences that were triggered. A single event can trigger multiple geofences.
                 List<Geofence> triggeringGeofences = geoFencingEvent.getTriggeringGeofences();
-                Log.d(TAG, "triggeringGeofences: "+triggeringGeofences.size());
 
                 // Get the transition details as a String.
                 String geofenceTransitionDetails = getGeofenceTransitionDetails(geoFencingTransition,

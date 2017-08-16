@@ -1,6 +1,14 @@
 package sminq.com.geolocation_test;
 
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v4.app.NotificationCompatSideChannelService;
+import android.widget.TextView;
+
 import com.google.android.gms.location.Geofence;
+
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -19,6 +27,8 @@ public class GeofenceBuilder {
     public static ArrayList<Geofence> geoFencesAl;
     private static HashMap<String, LatLongPOJO> circularRegionMap = new HashMap<>();
     private static final int radius = 100;//This is the radius of GeoFencing.
+    private @NonNull static TextView textBuilder;
+    private static Context mContext;
 
     /**
      * Developer should call this method to get the List of Geofences to be added in the App.
@@ -38,7 +48,13 @@ public class GeofenceBuilder {
             Iterator it = circularRegionMap.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry pair = (Map.Entry) it.next();
-                System.out.println(pair.getKey() + " = " + pair.getValue());
+
+                //        mMainTxtV.setText(getString(R.string.introTextPrefix)
+//                +" ("+latitude+","+longitude+") "
+//                +getString(R.string.introTextMiddle)
+//                +" "+radius+" "
+//                +getString(R.string.introTextSuffix));
+
 
 
 
@@ -49,8 +65,42 @@ public class GeofenceBuilder {
                         .build();
 
 
-
                 geoFencesAl.add(geoFence);
+
+
+
+
+
+                ///////////////..............ADDING TEXT ON TEXTVIEW..........JUST FOR UI PURPOSES, NOTHING TO-DO WITH THE LOGIC..............\\\\\\\\\\\\\\\\\
+                if(GeofenceBuilder.textBuilder != null && mContext != null){
+
+                    if(GeofenceBuilder.textBuilder.getText().toString().trim().equals(mContext.getString(R.string.permission_rationale)))
+                        GeofenceBuilder.textBuilder.setText("");
+
+
+                    if(GeofenceBuilder.textBuilder.getText().toString().trim().isEmpty()){
+                        //if Txt is empty then control comes here....
+                        GeofenceBuilder.textBuilder.setText(mContext.getString(R.string.introTextPrefix)
+                                +" "+pair.getKey().toString().trim()+" "
+                                +" "+mContext.getString(R.string.introGeoFenceNameSuffix)
+                                +" ("+((LatLongPOJO) pair.getValue()).getLatitude()+","+((LatLongPOJO) pair.getValue()).getLongitude()+") "
+                                +mContext.getString(R.string.introTextMiddle)
+                                +" "+radius+" "
+                                +mContext.getString(R.string.introTextSuffix));
+                    }//if Text is empty closes here....
+                    else{
+                        //else textV is not empty so leta append the data.....
+                        GeofenceBuilder.textBuilder.append("\n\n\n"
+                                +mContext.getString(R.string.introTextPrefix)
+                                +" "+pair.getKey().toString().trim()
+                                +" "+mContext.getString(R.string.introGeoFenceNameSuffix)
+                                +" ("+((LatLongPOJO) pair.getValue()).getLatitude()+","+((LatLongPOJO) pair.getValue()).getLongitude()+") "
+                                +mContext.getString(R.string.introTextMiddle)
+                                +" "+radius+" "
+                                +mContext.getString(R.string.introTextSuffix));
+                    }//else closes here...
+                }//if(GeofenceBuilder.textBuilder != null) closes here...
+                //////////////////////..............DECORTAING UI CLOSES ABOVE.............\\\\\\\\\\\\\\\\\\\\\\\\\
 
                 it.remove(); // avoids a ConcurrentModificationException
             }//while (it.hasNext()) closes here....
@@ -73,4 +123,14 @@ public class GeofenceBuilder {
         circularRegionMap.put("PUNE JN", new LatLongPOJO(18.528896, 73.874391));
 
     }//initialize closes here.....
+
+
+    public static HashMap<String, LatLongPOJO> getCircularRegionMap() {
+        return circularRegionMap;
+    }
+
+    public static void setTextBuilder(@NonNull TextView textBuilder, @NotNull Context mContexr) {
+        GeofenceBuilder.textBuilder = textBuilder;
+        GeofenceBuilder.mContext = mContexr;
+    }
 }//GeofenceBuilder closes here....

@@ -31,6 +31,9 @@ import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by Pawan on 16/08/17.
@@ -80,12 +83,15 @@ public class MainActivity extends AppCompatActivity implements OnCompleteListene
         chkLocationPermissions();
 
 
+        //////////////////...........SENDING TEXTVIEW TO ADD THE TEXT IN IT...........\\\\\\\\\\\\\\\\\
+        GeofenceBuilder.setTextBuilder(mMainTxtV, MainActivity.this);//Only for UI purposes....
 
-        mMainTxtV.setText(getString(R.string.introTextPrefix)
-                +" ("+latitude+","+longitude+") "
-                +getString(R.string.introTextMiddle)
-                +" "+radius+" "
-                +getString(R.string.introTextSuffix));
+
+//        mMainTxtV.setText(getString(R.string.introTextPrefix)
+//                +" ("+latitude+","+longitude+") "
+//                +getString(R.string.introTextMiddle)
+//                +" "+radius+" "
+//                +getString(R.string.introTextSuffix));
 
 
 
@@ -229,9 +235,13 @@ public class MainActivity extends AppCompatActivity implements OnCompleteListene
 
 
 
-            if(ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            if(ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                //If permissiosns were granted & geoFences were added successfully w.r.t the Intetn Service then control coems here...
+
                 mGeoFencingClient.addGeofences(geoFencingRequst, geoFencingIntent)
                         .addOnCompleteListener(MainActivity.this);
+
+            }//if geoFences added successfully in connection of Intent Service closes here.....
             else
                 Log.w(TAG, "Geo Fence not added, bcoz of permission issues !");
         }//if(mGeoFencingClient != null) closes here....
