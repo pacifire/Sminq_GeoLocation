@@ -11,15 +11,19 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -28,7 +32,7 @@ import java.util.Calendar;
  * Created by Pawan on 16/08/17.
  */
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnCompleteListener<Void> {
 
     //High priority UI variables goes below...
     private TextView mMainTxtV;
@@ -36,9 +40,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     //Medium priority variables goes below....
-    private final int radius = 40;//This is the radius of GeoFencing.
-    private final double latitude = 40;//THis is the Latitude of the GeoFencing.
-    private final double longitude = 40;//This is the Longitude of the GeoFencing.
+    private final int radius = 1609;//This is the radius of GeoFencing.
+    private final double latitude = 19.062964;//THis is the Latitude of the GeoFencing.
+    private final double longitude = 72.998081;//This is the Longitude of the GeoFencing.
     private GeofencingClient mGeoFencingClient;
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
     private final String GEO_FENCE_KEY = "SMINQ_OFFICE_LOCATION";
@@ -222,7 +226,8 @@ public class MainActivity extends AppCompatActivity {
 
 
             if(ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-                mGeoFencingClient.addGeofences(geoFencingRequst, geoFencingIntent);
+                mGeoFencingClient.addGeofences(geoFencingRequst, geoFencingIntent)
+                        .addOnCompleteListener(MainActivity.this);
             else
                 Log.w(TAG, "Geo Fence not added, bcoz of permission issues !");
         }//if(mGeoFencingClient != null) closes here....
@@ -250,4 +255,20 @@ public class MainActivity extends AppCompatActivity {
                 .setAction(getString(actionStringId), listener).show();
     }//showSnackbar closes here....
 
+    @Override
+    public void onComplete(@NonNull Task<Void> task) {
+        Toast.makeText(this, getString(R.string.geofences_added), Toast.LENGTH_SHORT).show();
+    }//onComplete closes here....
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+
+        if(ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            addGeofences();
+        else
+            chkLocationPermissions();
+    }//onStart closes here....
 }//MainActivity closes here....
