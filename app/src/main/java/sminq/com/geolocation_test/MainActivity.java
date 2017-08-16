@@ -1,9 +1,13 @@
 package sminq.com.geolocation_test;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -36,13 +40,20 @@ public class MainActivity extends AppCompatActivity implements OnCompleteListene
 
     //High priority UI variables goes below...
     private TextView mMainTxtV;
+    private AlertDialog gpsAlertDialog;
 
 
 
     //Medium priority variables goes below....
-    private final int radius = 1609;//This is the radius of GeoFencing.
-    private final double latitude = 19.062964;//THis is the Latitude of the GeoFencing.
-    private final double longitude = 72.998081;//This is the Longitude of the GeoFencing.
+    private final int radius = 100;//This is the radius of GeoFencing.
+//    private final double latitude = 19.062964;//THis is the Latitude of the GeoFencing.
+//    private final double longitude = 72.998081;//This is the Longitude of the GeoFencing.
+
+    //Below is SMINQ OFFICE LOCATION....
+    private final double latitude = 18.544763;//THis is the Latitude of the GeoFencing.
+    private final double longitude = 73.911425;//This is the Longitude of the GeoFencing.
+
+
     private GeofencingClient mGeoFencingClient;
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
     private final String GEO_FENCE_KEY = "SMINQ_OFFICE_LOCATION";
@@ -122,9 +133,12 @@ public class MainActivity extends AppCompatActivity implements OnCompleteListene
                 ActivityCompat.requestPermissions(MainActivity.this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         REQUEST_PERMISSIONS_REQUEST_CODE);
+
             }//else Requesting Permissions closes here....
 
         }//if ACCESS_FINE_LOCATION is PErmission Denied closes here....
+        else//ACCESS_FINE_LOCATION IS ALREADY GRANTED..
+            checkDeviceGPSSettings();
 
     }//chkLocationPermissions closes here.....
 
@@ -147,6 +161,8 @@ public class MainActivity extends AppCompatActivity implements OnCompleteListene
                 else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.i(TAG, "Permission granted.");
                     addGeofences();
+
+                    checkDeviceGPSSettings();
                 }//else if PERMISSIONS_GRANTED closes here....
                 else {
                     // Permission denied.
@@ -182,6 +198,7 @@ public class MainActivity extends AppCompatActivity implements OnCompleteListene
                 break;
         }//switch (requestCode) closes here....
     }//onRequestPermissionsResult closes here....
+
 
 
 
@@ -271,4 +288,50 @@ public class MainActivity extends AppCompatActivity implements OnCompleteListene
         else
             chkLocationPermissions();
     }//onStart closes here....
+
+
+    /**
+     * If device's GPS is OFF, then we need to request user for enabling the GPS.
+     * **/
+    private void checkDeviceGPSSettings() {
+        final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            /**
+             * GPS Provider is disabled.
+             * **/
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(getString(R.string.gpsErrorString))
+                    .setCancelable(false)
+                    .setPositiveButton(getString(R.string.yesSpelling), new DialogInterface.OnClickListener() {
+                        public void onClick(final DialogInterface dialog, final int id) {
+                            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+
+                            addGeofences();
+                        }
+                    })
+                    .setNegativeButton(getString(R.string.noSpelling), new DialogInterface.OnClickListener() {
+                        public void onClick(final DialogInterface dialog, final int id) {
+                            dialog.cancel();
+                        }
+                    });
+            gpsAlertDialog = builder.create();
+            gpsAlertDialog.show();
+        }//if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) closes here....
+    }//checkDeviceGPSSettings closes here....
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+
+        /**
+         * To handle $BadWindowTokenException....
+         * **/
+        if(gpsAlertDialog != null)
+            if(gpsAlertDialog.isShowing())
+                gpsAlertDialog.dismiss();
+    }//onDestroy closes here....
 }//MainActivity closes here....
