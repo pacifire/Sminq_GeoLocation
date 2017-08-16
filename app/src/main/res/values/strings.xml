@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Sminq_Geolocation_Test</string>
+
+
+    <string name="introTextPrefix">The lat &amp; long for the GeoFencing are:</string>
+    <string name="introTextMiddle">respectively. Also, the radius for the Geofencing is: </string>
+    <string name="introTextSuffix">miles.</string>
+
+    <string name="permission_rationale">Location permission is needed for core functionality</string>
+    <string name="permission_denied_explanation">Permission was denied, but is needed for core functionality.</string>
+    <string name="settings">Settings</string>
+
 </resources>
